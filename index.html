@@ -718,8 +718,8 @@
       totalNum.textContent = quizData.length;
     }
 
-    // Start quiz
-    function startquiz() {
+    // Start quiz - FIXED: lowercase 'q'
+    function startQuiz() {
       startScreen.classList.remove('active');
       quizScreen.classList.add('active');
       loadQuestion();
@@ -754,8 +754,8 @@
         button.onclick = () => selectOption(index, button);
         optionsContainer.appendChild(button);
       });
-      
-      // Reset next button
+
+    // Reset next button
       nextBtn.disabled = true;
       selectedAnswer = false;
     }
@@ -794,7 +794,7 @@
         currentScore.textContent = score;
         feedbackMessage.textContent = "✓ Correct! Well done!";
         feedbackMessage.className = 'feedback-message feedback-correct';
-        } else {
+      } else {
         feedbackMessage.textContent = "✗ Incorrect! The correct answer is highlighted in green.";
         feedbackMessage.className = 'feedback-message feedback-incorrect';
       }
@@ -825,8 +825,8 @@
       
       const percentage = Math.round((score / quizData.length) * 100);
       scoreValue.textContent = ${percentage}%;
-      
-      // Set the fill percentage for the circle
+
+    // Set the fill percentage for the circle
       scoreCircle.style.setProperty('--fill-percent', ${percentage}%);
       
       // Set result message
@@ -908,8 +908,8 @@
         for (let i = 0; i < drops.length; i++) {
           const text = charArray[Math.floor(Math.random() * charArray.length)];
           ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-        // Reset drop if it reaches bottom or randomly
+          
+          // Reset drop if it reaches bottom or randomly
           if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
             drops[i] = 0;
           }
