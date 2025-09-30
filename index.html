@@ -7,10 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root {
-      --primary: #00f3ff;
-      --darker: #05071e;
-    }
+    :root { --primary: #00f3ff; --darker: #05071e; }
     body { margin: 0; font-family: 'Exo 2', sans-serif; background: #05071e; color: #fff; overflow: hidden; }
     .matrix-bg { position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1; background:#05071e; }
     .container { position: relative; z-index: 1; width: 100%; max-width: 900px; margin: auto; padding: 20px; }
@@ -62,54 +59,59 @@
   <script>
     const quizData = [
       {
-        question: "What is the primary function of an AI Agent within the Sentient ecosystem?",
+        question: "What is Sentient's primary mission?",
         options: [
-          "To mine new cryptocurrency tokens.",
-          "To act as an autonomous, goal-oriented AI that can be trained and monetized by users.",
-          "To provide secure storage for digital assets.",
-          "To validate transactions on the blockchain."
+          "To develop proprietary AGI systems for corporate use",
+          "To ensure that Artificial General Intelligence (AGI) remains open-source and not controlled by any single entity",
+          "To create closed-source AI models for commercial applications",
+          "To build the most advanced AI models for military purposes"
         ],
         correct: 1,
-        explanation: "AI Agents are the core building blocks of Sentient. They can be specialized, trained on data, and used to perform tasks, with their creators earning rewards."
+        explanation: "Sentient’s core mission is to keep AGI accessible and prevent monopoly control by any single company or organization. They emphasize open-source development so AI benefits everyone, promoting transparency and equitable access."
       },
       {
-        question: "Which blockchain network is the Sentient platform primarily built on?",
-        options: ["Ethereum", "Solana", "Polygon", "Bitcoin"],
-        correct: 2,
-        explanation: "Sentient is built on the Polygon network, leveraging its scalability and low transaction fees."
-      },
-      {
-        question: "What is the primary purpose of the Sentient Marketplace?",
+        question: "What is the GRID in the context of Sentient?",
         options: [
-          "To trade NFTs.",
-          "To buy and sell computational power for AI training.",
-          "To facilitate the trading, leasing, and collaboration of AI Agents and their components (Models, Datasets, Prompts).",
-          "To serve as a decentralized exchange for cryptocurrencies."
-        ],
-        correct: 2,
-        explanation: "The Marketplace is a hub where users can monetize AI creations by selling or leasing them to others, including models, datasets, and prompts."
-      },
-      {
-        question: "According to the blog, what problem is Sentient aiming to solve in the current AI landscape?",
-        options: [
-          "The high cost of GPU hardware.",
-          "The centralization of AI power and profits among a few large corporations.",
-          "The lack of programming languages for AI development.",
-          "The environmental impact of AI models."
+          "A new AI model developed by Sentient",
+          "The world's largest network of intelligence, containing agents, models, data sources, frameworks, and Sentient Chat",
+          "A proprietary search engine developed by Sentient",
+          "A hardware platform for AI computations"
         ],
         correct: 1,
-        explanation: "Sentient aims to create a decentralized, open, user-owned AI ecosystem, countering the monopoly of large tech companies on AI development and profits."
+        explanation: "The GRID is a vast ecosystem combining multiple AI agents, models, and data sources. It serves as an interconnected network where AI agents can access tools, share knowledge, and work collaboratively."
       },
       {
-        question: "What role does the PSI ($PSI) token play in the Sentient ecosystem?",
+        question: "What is ROMA in Sentient's ecosystem?",
         options: [
-          "It is a stablecoin used for pricing AI services.",
-          "It is solely a governance token for voting on proposals.",
-          "It is used for payments, staking, incentivizing participation, and governing the platform.",
-          "It is a token used only for initial fundraising and has no further utility."
+          "A new programming language developed by Sentient",
+          "A meta-agent framework for building high-performance multi-agent systems",
+          "A database management system for AI models",
+          "A hardware device for AI computations"
         ],
-        correct: 2,
-        explanation: "The PSI token is the native utility token of Sentient, used for payments, staking, rewards, and governance participation."
+        correct: 1,
+        explanation: "ROMA stands for 'Recursive Open Meta-Agent.' It facilitates complex multi-agent systems where AI agents interact, coordinate, and achieve sophisticated tasks, enabling scalable AI networks."
+      },
+      {
+        question: "What is the purpose of Sentient Chat?",
+        options: [
+          "To provide a platform for AI agents to communicate with each other",
+          "To serve as the user interface for accessing the GRID and interacting with AI agents",
+          "To develop new AI models",
+          "To manage AI model training processes"
+        ],
+        correct: 1,
+        explanation: "Sentient Chat is the interface through which users can access the GRID, interact with AI agents, and execute tasks efficiently."
+      },
+      {
+        question: "What is the Builder Program at Sentient?",
+        options: [
+          "A program for developers to design and build impactful, high-utility agents to operate within the Sentient Chat ecosystem",
+          "A training program for AI models",
+          "A research initiative for developing new AI algorithms",
+          "A marketing program to promote Sentient's products"
+        ],
+        correct: 0,
+        explanation: "The Builder Program empowers developers to create AI agents that plug directly into the Sentient ecosystem, fostering innovation and expanding the utility of Sentient Chat."
       }
     ];
 
