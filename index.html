@@ -7,11 +7,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* All your existing CSS styles remain exactly the same */
     :root {
       --primary: #00f3ff;
       --secondary: #7b42f6;
       --accent: #ff2a6d;
+      --correct: #14e68c;
+      --incorrect: #ff2a6d;
       --dark: #0c0e27;
       --darker: #05071e;
       --light: #d1f7ff;
@@ -215,14 +216,23 @@
     
     .option-btn.correct {
       background: rgba(20, 150, 80, 0.2);
-      border-color: #14e68c;
-      color: #14e68c;
+      border-color: var(--correct);
+      color: var(--correct);
+      box-shadow: 0 0 20px rgba(20, 230, 140, 0.3);
     }
     
     .option-btn.incorrect {
       background: rgba(255, 42, 109, 0.2);
-      border-color: var(--accent);
-      color: var(--accent);
+      border-color: var(--incorrect);
+      color: var(--incorrect);
+      box-shadow: 0 0 20px rgba(255, 42, 109, 0.3);
+      animation: shake 0.5s ease;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
     }
     
     .option-letter {
@@ -237,6 +247,36 @@
       font-weight: bold;
       color: var(--primary);
       flex-shrink: 0;
+      transition: var(--transition);
+    }
+    
+    .option-btn.correct .option-letter {
+      background: var(--correct);
+      color: var(--darker);
+      box-shadow: 0 0 10px var(--correct);
+    }
+    
+    .option-btn.incorrect .option-letter {
+      background: var(--incorrect);
+      color: var(--darker);
+      box-shadow: 0 0 10px var(--incorrect);
+    }
+    
+    .option-status {
+      margin-left: auto;
+      font-size: 1.2rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .option-btn.correct .option-status {
+      opacity: 1;
+      color: var(--correct);
+    }
+    
+    .option-btn.incorrect .option-status {
+      opacity: 1;
+      color: var(--incorrect);
     }
     
     .explanation-box {
@@ -448,6 +488,28 @@
       text-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), 0 0 15px var(--primary), 0 0 20px var(--secondary);
     }
     
+    .feedback-message {
+      padding: 15px;
+      border-radius: 10px;
+      margin: 15px 0;
+      text-align: center;
+      font-weight: bold;
+      animation: slideDown 0.5s ease;
+      display: none;
+    }
+    
+    .feedback-correct {
+      background: rgba(20, 230, 140, 0.1);
+      border: 1px solid var(--correct);
+      color: var(--correct);
+    }
+    
+    .feedback-incorrect {
+      background: rgba(255, 42, 109, 0.1);
+      border: 1px solid var(--incorrect);
+      color: var(--incorrect);
+    }
+    
     @media (max-width: 768px) {
       .screen {
         padding: 20px;
@@ -523,12 +585,16 @@
       
       <div class="question-container">
         <h2 class="question-text" id="question-text"></h2>
+        
+        <!-- Feedback Message -->
+        <div id="feedback-message" class="feedback-message"></div>
+        
         <div id="options" class="options-grid"></div>
         
         <div id="explanation-box" class="explanation-box">
           <h3><i class="fas fa-info-circle"></i> Explanation</h3>
           <p id="explanation-text"></p>
-        </div>
+          </div>
       </div>
       
       <div class="controls">
@@ -537,7 +603,7 @@
         </button>
       </div>
     </div>
-    
+
     <!-- Result Screen -->
     <div id="result-screen" class="screen">
       <div class="header">
@@ -626,6 +692,7 @@
     let currentIndex = 0;
     let score = 0;
     let selectedAnswer = false;
+
     // DOM elements
     const startScreen = document.getElementById('start-screen');
     const quizScreen = document.getElementById('quiz-screen');
@@ -634,6 +701,7 @@
     const optionsContainer = document.getElementById('options');
     const explanationBox = document.getElementById('explanation-box');
     const explanationText = document.getElementById('explanation-text');
+    const feedbackMessage = document.getElementById('feedback-message');
     const nextBtn = document.getElementById('next-btn');
     const currentNum = document.getElementById('current-num');
     const totalNum = document.getElementById('total-num');
@@ -650,9 +718,8 @@
       totalNum.textContent = quizData.length;
     }
 
-    // Start quiz - FIXED: Changed from startQuiz to startQuiz
+    // Start quiz
     function startQuiz() {
-      console.log("Start quiz function called"); // Debug log
       startScreen.classList.remove('active');
       quizScreen.classList.add('active');
       loadQuestion();
@@ -668,10 +735,12 @@
       // Update progress bar
       progressFill.style.width = `${(currentIndex / quizData.length) * 100}%`;
       
-      // Clear options and explanation
+      // Clear options, explanation, and feedback
       optionsContainer.innerHTML = '';
       explanationBox.style.display = 'none';
-
+      feedbackMessage.style.display = 'none';
+      feedbackMessage.className = 'feedback-message';
+      
       // Create option buttons
       const letters = ['A', 'B', 'C', 'D'];
       q.options.forEach((option, index) => {
@@ -680,6 +749,7 @@
         button.innerHTML = `
           <span class="option-letter">${letters[index]}</span>
           <span class="option-text">${option}</span>
+          <span class="option-status"></span>
         `;
         button.addEventListener('click', () => selectOption(index, button));
         optionsContainer.appendChild(button);
@@ -702,19 +772,31 @@
       // Disable all options
       options.forEach(opt => opt.style.pointerEvents = 'none');
       
-      // Mark correct/incorrect
+      // Mark correct/incorrect with visual feedback
       options.forEach((opt, i) => {
         if (i === q.correct) {
           opt.classList.add('correct');
+          // Add checkmark to correct answer
+          const status = opt.querySelector('.option-status');
+          status.innerHTML = '<i class="fas fa-check"></i>';
         } else if (i === index && i !== q.correct) {
           opt.classList.add('incorrect');
+          // Add X mark to incorrect selected answer
+          const status = opt.querySelector('.option-status');
+          status.innerHTML = '<i class="fas fa-times"></i>';
         }
       });
-      
-      // Update score if correct
+
+      // Show feedback message
+      feedbackMessage.style.display = 'block';
       if (index === q.correct) {
         score++;
         currentScore.textContent = score;
+        feedbackMessage.textContent = "✓ Correct! Well done!";
+        feedbackMessage.className = 'feedback-message feedback-correct';
+      } else {
+        feedbackMessage.textContent = "✗ Incorrect! The correct answer is highlighted in green.";
+        feedbackMessage.className = 'feedback-message feedback-incorrect';
       }
       
       // Show explanation
@@ -781,12 +863,13 @@
         const posX = Math.random() * 100;
         const delay = Math.random() * 15;
         const duration = Math.random() * 10 + 15;
-
+        
         particle.style.width = `${size}px`;
         particle.style.height = `${size}px`;
         particle.style.left = `${posX}%`;
         particle.style.animationDelay = `${delay}s`;
         particle.style.animationDuration = `${duration}s`;
+        
         particlesContainer.appendChild(particle);
       }
     }
@@ -824,7 +907,7 @@
         for (let i = 0; i < drops.length; i++) {
           const text = charArray[Math.floor(Math.random() * charArray.length)];
           ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
+          
           // Reset drop if it reaches bottom or randomly
           if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
             drops[i] = 0;
