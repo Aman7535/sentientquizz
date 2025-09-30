@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sentient AI Quiz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #00f3ff;
+      --secondary: #7b42f6;
+      --accent: #ff2a6d;
+      --dark: #0c0e27;
+      --darker: #05071e;
+      --light: #d1f7ff;
+      --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Exo 2', sans-serif;
+      background: var(--darker);
+      color: var(--light);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .matrix-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.4;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 900px;
+      background: rgba(12, 14, 39, 0.85);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 50px rgba(0, 243, 255, 0.2);
+      border: 1px solid rgba(123, 66, 246, 0.3);
+      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 1;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+    
+    .container::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, var(--primary), var(--secondary), var(--accent), var(--primary));
+      z-index: -1;
+      border-radius: 22px;
+      animation: borderGlow 8s linear infinite;
+      background-size: 400%;
+    }
+    
+    @keyframes borderGlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .screen {
+      padding: 40px;
+      display: none;
+      flex-direction: column;
+      min-height: 600px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .active {
+      display: flex;
+      animation: fadeIn 0.8s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+    }
+    
+    .header h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 900;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+      position: relative;
+      display: inline-block;
+    }
+    
+    .header h1::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 10%;
+      width: 80%;
+      height: 3px;
+      background: linear-gradient(to right, transparent, var(--primary), transparent);
+    }
+    
+    .header p {
+      font-size: 1.2rem;
+      color: #a0b3c9;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    
+    .question-container {
+      background: rgba(5, 7, 30, 0.7);
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(0, 243, 255, 0.1);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+      }
+    
+    .question-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background: var(--primary);
+    }
+    
+    .question-text {
+      font-size: 1.5rem;
+      margin-bottom: 25px;
+      line-height: 1.5;
+      color: var(--light);
+    }
+    
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    
+    .option-btn {
+      background: rgba(15, 20, 50, 0.7);
+      border: 1px solid rgba(123, 66, 246, 0.3);
+      border-radius: 10px;
+      padding: 18px 20px;
+      color: var(--light);
+      font-family: 'Exo 2', sans-serif;
+      font-size: 1.1rem;
+      text-align: left;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+    
+    .option-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 243, 255, 0.2);
+      border-color: var(--primary);
+      background: rgba(25, 30, 70, 0.8);
+    }
+    
+    .option-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .option-btn:hover::before {
+      left: 100%;
+    }
+    
+    .option-btn.correct {
+      background: rgba(20, 150, 80, 0.2);
+      border-color: #14e68c;
+      color: #14e68c;
+    }
+    
+    .option-btn.incorrect {
+      background: rgba(255, 42, 109, 0.2);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .option-letter {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 30px;
+      height: 30px;
+      background: rgba(123, 66, 246, 0.2);
+      border-radius: 50%;
+      margin-right: 15px;
+      font-weight: bold;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+    
+    .explanation-box {
+      background: rgba(5, 7, 30, 0.8);
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+      border-left: 4px solid var(--primary);
+      animation: slideDown 0.5s ease;
+      display: none;
+    }
+    
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .explanation-box h3 {
+      color: var(--primary);
+      margin-bottom: 10px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem;
+    }
+    
+    .progress-container {
+      margin: 30px 0;
+    }
+    
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+      color: #a0b3c9;
+    }
+    
+    .progress-bar {
+      height: 8px;
+      background: rgba(15, 20, 50, 0.7);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(to right, var(--secondary), var(--primary));
+      border-radius: 10px;
+      width: 0%;
+      transition: width 0.5s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      animation: progressShine 2s infinite;
+    }
+    
+    @keyframes progressShine {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+    
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, var(--secondary), var(--primary));
+      color: var(--darker);
+      border: none;
+      padding: 15px 40px;
+      border-radius: 50px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 5px 15px rgba(123, 66, 246, 0.4);
+    }
+    
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 243, 255, 0.5);
+    }
+    
+    .btn:active {
+      transform: translateY(1px);
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .result-screen {
+      text-align: center;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .score-circle {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 30px auto;
+      position: relative;
+      background: conic-gradient(var(--primary) 0%, var(--darker) 0%);
+      box-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
+      animation: fillCircle 1.5s ease forwards;
+    }
+    
+    @keyframes fillCircle {
+      to {
+        background: conic-gradient(var(--primary) var(--fill-percent), var(--darker) 0%);
+      }
+    }
+    
+    .score-circle::before {
+      content: '';
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      background: var(--darker);
+      border-radius: 50%;
+      z-index: 1;
+    }
+    
+    .score-text {
+      position: relative;
+      z-index: 2;
+      font-family: 'Orbitron', sans-serif;
+    }
+    
+    .score-value {
+      font-size: 3rem;
+      font-weight: 900;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .score-label {
+      font-size: 1rem;
+      color: #a0b3c9;
+      margin-top: 5px;
+    }
+    
+    .result-message {
+      font-size: 1.5rem;
+      margin: 20px 0;
+      color: var(--light);
+    }
+    
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+    
+    .particle {
+      position: absolute;
+      background: var(--primary);
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: float 15s infinite linear;
+    }
+    
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.7;
+      }
+      90% {
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    .neon-text {
+      text-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), 0 0 15px var(--primary), 0 0 20px var(--secondary);
+    }
+    
+    @media (max-width: 768px) {
+      .screen {
+        padding: 20px;
+      }
+      
+      .header h1 {
+        font-size: 2.5rem;
+      }
+      
+      .question-text {
+        font-size: 1.3rem;
+      }
+      
+      .option-btn {
+        padding: 15px;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="matrix-bg" id="matrixBg"></div>
+  
+  <div class="container">
+    <div class="particles" id="particles"></div>
+    
+    <!-- Start Screen -->
+    <div id="start-screen" class="screen active">
+      <div class="header">
+        <h1><i class="fas fa-robot"></i> Sentient AI</h1>
+        <p>Test your knowledge of the decentralized AI platform shaping the future</p>
+      </div>
+      
+      <div class="question-container">
+        <div class="question-text">
+          Welcome to the Sentient AI Quiz Challenge. This interactive experience will test your understanding of the revolutionary Sentient platform, its AI agents, marketplace, and the PSI token ecosystem.
+          </div>
+        
+        <div class="options-grid">
+          <div class="option-btn" style="justify-content: center; cursor: default; border: none;">
+            <i class="fas fa-brain" style="margin-right: 10px; color: var(--primary);"></i>
+            <span>5 Challenging Questions</span>
+          </div>
+          <div class="option-btn" style="justify-content: center; cursor: default; border: none;">
+            <i class="fas fa-trophy" style="margin-right: 10px; color: var(--primary);"></i>
+            <span>Immediate Feedback & Explanations</span>
+          </div>
+          <div class="option-btn" style="justify-content: center; cursor: default; border: none;">
+            <i class="fas fa-rocket" style="margin-right: 10px; color: var(--primary);"></i>
+            <span>Futuristic Interactive Experience</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="controls">
+        <button class="btn" onclick="startQuiz()">
+          <i class="fas fa-play" style="margin-right: 10px;"></i> Begin Quiz
+        </button>
+      </div>
+    </div>
+    
+    <!-- Quiz Screen -->
+    <div id="quiz-screen" class="screen">
+      <div class="progress-container">
+        <div class="progress-info">
+          <span>Question <span id="current-num">1</span> of <span id="total-num">5</span></span>
+          <span>Score: <span id="current-score">0</span></span>
+        </div>
+        <div class="progress-bar">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
+      </div>
+      
+      <div class="question-container">
+        <h2 class="question-text" id="question-text"></h2>
+        <div id="options" class="options-grid"></div>
+        
+        <div id="explanation-box" class="explanation-box">
+          <h3><i class="fas fa-info-circle"></i> Explanation</h3>
+          <p id="explanation-text"></p>
+        </div>
+      </div>
+      
+      <div class="controls">
+        <button id="next-btn" class="btn" onclick="nextQuestion()" disabled>
+          Next Question <i class="fas fa-arrow-right" style="margin-left: 10px;"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Result Screen -->
+    <div id="result-screen" class="screen">
+      <div class="header">
+        <h1>Mission Complete</h1>
+        <p>Your Sentient AI knowledge has been evaluated</p>
+      </div>
+      
+      <div class="score-circle" id="score-circle">
+        <div class="score-text">
+          <div class="score-value" id="score-value">0%</div>
+          <div class="score-label">Final Score</div>
+        </div>
+      </div>
+      
+      <div class="result-message" id="result-message"></div>
+      
+      <div class="controls">
+        <button class="btn" onclick="restartQuiz()">
+          <i class="fas fa-redo" style="margin-right: 10px;"></i> Try Again
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Quiz data
+    const quizData = [
+      {
+        question: "What is the primary function of an AI Agent within the Sentient ecosystem?",
+        options: [
+          "To mine new cryptocurrency tokens",
+          "To act as an autonomous, goal-oriented AI that can be trained and monetized by users",
+          "To provide secure storage for digital assets",
+          "To validate transactions on the blockchain"
+        ],
+        correct: 1,
+        explanation: "The blog describes AI Agents as the core building blocks of Sentient. They are AIs that can be specialized, trained on data, and used to perform tasks, with their creators earning rewards."
+      },
+      {
+        question: "Which blockchain network is the Sentient platform primarily built on?",
+        options: [
+          "Ethereum",
+          "Solana", 
+          "Polygon",
+          "Bitcoin"
+        ],
+        correct: 2,
+        explanation: "The blog's footer and several announcements mention that Sentient is building on the Polygon network, leveraging its scalability and low transaction fees."
+        },
+      {
+        question: "What is the primary purpose of the Sentient Marketplace?",
+        options: [
+          "To trade NFTs",
+          "To buy and sell computational power for AI training",
+          "To facilitate the trading, leasing, and collaboration of AI Agents and their components",
+          "To serve as a decentralized exchange for cryptocurrencies"
+        ],
+        correct: 2,
+        explanation: "The Marketplace is a key part of the ecosystem, designed as a hub where users can monetize their AI creations by selling or leasing them to others."
+      },
+      {
+        question: "According to the blog, what problem is Sentient aiming to solve in the current AI landscape?",
+        options: [
+          "The high cost of GPU hardware",
+          "The centralization of AI power and profits among a few large corporations", 
+          "The lack of programming languages for AI development",
+          "The environmental impact of AI models"
+        ],
+        correct: 1,
+        explanation: "A core theme of the blog is creating a decentralized, open, and user-owned AI ecosystem. It positions Sentient as a solution to break the monopoly of big tech companies on AI development and the economic benefits it generates."
+      },
+      {
+        question: "What role does the ψ (PSI) token play in the Sentient ecosystem?",
+        options: [
+          "It is a stablecoin used for pricing AI services",
+          "It is solely a governance token for voting on proposals",
+          "It is used for payments, staking, incentivizing participation, and governing the platform",
+          "It is a token used only for initial fundraising and has no further utility"
+        ],
+        correct: 2,
+        explanation: "The ψ (PSI) token is the native utility token of Sentient. The blog describes its use in various functions, including paying for services in the marketplace, staking to secure the network, rewarding users, and participating in governance decisions."
+      }
+    ];
+
+    // Quiz state
+    let currentIndex = 0;
+    let score = 0;
+    let selectedAnswer = false;
+
+    // DOM elements
+    const startScreen = document.getElementById('start-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options');
+    const explanationBox = document.getElementById('explanation-box');
+    const explanationText = document.getElementById('explanation-text');
+    const nextBtn = document.getElementById('next-btn');
+    const currentNum = document.getElementById('current-num');
+    const totalNum = document.getElementById('total-num');
+    const currentScore = document.getElementById('current-score');
+    const progressFill = document.getElementById('progress-fill');
+    const scoreValue = document.getElementById('score-value');
+    const resultMessage = document.getElementById('result-message');
+    const scoreCircle = document.getElementById('score-circle');
+
+    // Initialize
+    function init() {
+      createParticles();
+      createMatrixBackground();
+      totalNum.textContent = quizData.length;
+    }
+
+    // Start quiz
+    function startQuiz() {
+      startScreen.classList.remove('active');
+      quizScreen.classList.add('active');
+      loadQuestion();
+    }
+
+    // Load question
+    function loadQuestion() {
+      const q = quizData[currentIndex];
+      currentNum.textContent = currentIndex + 1;
+      questionText.textContent = q.question;
+      currentScore.textContent = score;
+      
+      // Update progress bar
+      progressFill.style.width = ${(currentIndex / quizData.length) * 100}%;
+      
+      // Clear options and explanation
+    optionsContainer.innerHTML = '';
+      explanationBox.style.display = 'none';
+      
+      // Create option buttons
+      const letters = ['A', 'B', 'C', 'D'];
+      q.options.forEach((option, index) => {
+        const button = document.createElement('button');
+        button.className = 'option-btn';
+        button.innerHTML = 
+          <span class="option-letter">${letters[index]}</span>
+          <span class="option-text">${option}</span>
+        ;
+        button.addEventListener('click', () => selectOption(index, button));
+        optionsContainer.appendChild(button);
+      });
+      
+      // Reset next button
+      nextBtn.disabled = true;
+      selectedAnswer = false;
+    }
+
+    // Select option
+    function selectOption(index, button) {
+      if (selectedAnswer) return;
+      
+      selectedAnswer = true;
+      const q = quizData[currentIndex];
+      const options = document.querySelectorAll('.option-btn');
+      const letters = ['A', 'B', 'C', 'D'];
+      
+      // Disable all options
+      options.forEach(opt => opt.style.pointerEvents = 'none');
+      
+      // Mark correct/incorrect
+      options.forEach((opt, i) => {
+        if (i === q.correct) {
+          opt.classList.add('correct');
+        } else if (i === index && i !== q.correct) {
+          opt.classList.add('incorrect');
+        }
+      });
+      
+      // Update score if correct
+      if (index === q.correct) {
+        score++;
+        currentScore.textContent = score;
+      }
+      
+      // Show explanation
+      explanationText.textContent = q.explanation;
+      explanationBox.style.display = 'block';
+      
+      // Enable next button
+      nextBtn.disabled = false;
+    }
+
+    // Next question
+    function nextQuestion() {
+      currentIndex++;
+      if (currentIndex < quizData.length) {
+        loadQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    // Show results
+    function showResults() {
+      quizScreen.classList.remove('active');
+      resultScreen.classList.add('active');
+      
+      const percentage = Math.round((score / quizData.length) * 100);
+      scoreValue.textContent = ${percentage}%;
+      
+      // Set the fill percentage for the circle
+      scoreCircle.style.setProperty('--fill-percent', ${percentage}%);
+      
+      // Set result message
+      if (percentage >= 80) {
+        resultMessage.textContent = "Outstanding! You're a Sentient AI expert! 🚀";
+        resultMessage.classList.add('neon-text');
+      } else if (percentage >= 60) {
+        resultMessage.textContent = "Great job! You have solid Sentient knowledge! 💡";
+      } else if (percentage >= 40) {
+        resultMessage.textContent = "Good effort! Keep learning about Sentient AI! 🔍";
+      } else {
+        resultMessage.textContent = "Keep exploring the Sentient platform to improve! 📚";
+      }
+    }
+
+    // Restart quiz
+    function restartQuiz() {
+      currentIndex = 0;
+      score = 0;
+      resultScreen.classList.remove('active');
+      startScreen.classList.add('active');
+    }
+
+    // Create floating particles
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 30;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // Random properties
+        const size = Math.random() * 5 + 2;
+        const posX = Math.random() * 100;
+        const delay = Math.random() * 15;
+        const duration = Math.random() * 10 + 15;
+        
+        particle.style.width = ${size}px;
+        particle.style.height = ${size}px;
+        particle.style.left = ${posX}%;
+        particle.style.animationDelay = ${delay}s;
+        particle.style.animationDuration = ${duration}s;
+        
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    // Create matrix-like background
+    function createMatrixBackground() {
+      const canvas = document.getElementById('matrixBg');
+      const ctx = canvas.getContext('2d');
+      
+      // Set canvas size
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      
+      // Matrix characters
+      const chars = "01";
+      const charArray = chars.split("");
+      const fontSize = 14;
+      const columns = canvas.width / fontSize;
+      const drops = [];
+      
+      // Initialize drops
+    for (let i = 0; i < columns; i++) {
+        drops[i] = Math.floor(Math.random() * canvas.height / fontSize);
+      }
+      
+      // Draw function
+      function draw() {
+        // Semi-transparent black background for trail effect
+        ctx.fillStyle = "rgba(5, 7, 30, 0.04)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = "rgba(0, 243, 255, 0.8)";
+        ctx.font = ${fontSize}px 'Orbitron', monospace;
+        
+        for (let i = 0; i < drops.length; i++) {
+          const text = charArray[Math.floor(Math.random() * charArray.length)];
+          ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+          
+          // Reset drop if it reaches bottom or randomly
+          if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+          
+          drops[i]++;
+        }
+      }
+      
+      // Animation loop
+      setInterval(draw, 33);
+      
+      // Handle window resize
+      window.addEventListener('resize', function() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+    }
+
+    // Initialize on load
+    window.onload = init;
+  </script>
+</body>
+</html>
