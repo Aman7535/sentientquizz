@@ -650,7 +650,7 @@
       totalNum.textContent = quizData.length;
     }
 
-    // Start quiz
+    // Start quiz - FIXED FUNCTION NAME
     function startQuiz() {
       startScreen.classList.remove('active');
       quizScreen.classList.add('active');
@@ -666,9 +666,8 @@
       
       // Update progress bar
       progressFill.style.width = ${(currentIndex / quizData.length) * 100}%;
-      
       // Clear options and explanation
-    optionsContainer.innerHTML = '';
+      optionsContainer.innerHTML = '';
       explanationBox.style.display = 'none';
       
       // Create option buttons
