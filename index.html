@@ -27,25 +27,21 @@
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: -1; /* behind everything */
+      z-index: -1;
       background: #05071e;
     }
 
     .container {
       position: relative;
-      z-index: 1; /* on top of canvas */
+      z-index: 1;
       width: 100%;
       max-width: 900px;
       margin: auto;
       padding: 20px;
     }
 
-    .screen {
-      display: none;
-    }
-    .screen.active {
-      display: block;
-    }
+    .screen { display: none; }
+    .screen.active { display: block; }
 
     h1 {
       font-family: 'Orbitron', sans-serif;
@@ -63,10 +59,7 @@
       color: #05071e;
       transition: all 0.3s;
     }
-
-    .btn:hover {
-      background: #00d0e6;
-    }
+    .btn:hover { background: #00d0e6; }
 
     .options-grid {
       display: grid;
@@ -86,16 +79,11 @@
       transition: all 0.3s;
       color: #fff;
     }
-
-    .option-btn:hover {
-      background: rgba(0,243,255,0.2);
-    }
-
+    .option-btn:hover { background: rgba(0,243,255,0.2); }
     .option-btn.correct {
       border-color: #00ff88;
       background: rgba(0,255,136,0.2);
     }
-
     .option-btn.incorrect {
       border-color: #ff0033;
       background: rgba(255,0,51,0.2);
@@ -149,10 +137,20 @@
       background: rgba(255,0,51,0.2);
       border: 1px solid #ff0033;
     }
+
+    /* ✅ Explanation styling */
+    #explanation-text {
+      margin-top: 12px;
+      padding: 10px;
+      border-left: 3px solid var(--primary);
+      background: rgba(255,255,255,0.05);
+      border-radius: 4px;
+      font-style: italic;
+      display: none;
+    }
   </style>
 </head>
 <body>
-  <!-- FIXED: use canvas -->
   <canvas class="matrix-bg" id="matrixBg"></canvas>
 
   <div class="container">
@@ -185,7 +183,7 @@
   </div>
 
   <script>
-    // Example quiz data
+    // Full quiz with 5 questions
     const quizData = [
       {
         question: "What token powers the Sentient AI ecosystem?",
@@ -195,9 +193,42 @@
       },
       {
         question: "Sentient AI agents can:",
-        options: ["Learn and trade knowledge", "Only answer trivia", "Mine Bitcoin", "Run social media"],
+        options: [
+          "Learn and trade knowledge",
+          "Only answer trivia",
+          "Mine Bitcoin",
+          "Run social media"
+        ],
         correct: 0,
         explanation: "Sentient AI agents learn, trade, and collaborate."
+      },
+      {
+        question: "What underpins trust between Sentient AI agents?",
+        options: [
+          "Blockchain technology",
+          "Social media likes",
+          "Centralized servers",
+          "Paper contracts"
+        ],
+        correct: 0,
+        explanation: "Blockchain ensures secure, verifiable, trustless collaboration."
+      },
+      {
+        question: "Which consensus mechanism is Sentient AI aligned with?",
+        options: ["Proof of Intelligence", "Proof of Work", "Proof of Stake", "Proof of Burn"],
+        correct: 2,
+        explanation: "Sentient AI aligns with efficient Proof of Stake mechanisms."
+      },
+      {
+        question: "What is the primary benefit of the Sentient AI marketplace?",
+        options: [
+          "Enables agent-to-agent collaboration",
+          "Gives away free tokens",
+          "Runs a social network",
+          "Hosts memes"
+        ],
+        correct: 0,
+        explanation: "The marketplace allows AI agents to buy, sell, and share capabilities."
       }
     ];
 
@@ -229,6 +260,7 @@
       questionText.textContent = q.question;
       optionsContainer.innerHTML = '';
       feedbackMessage.style.display = 'none';
+      explanationText.style.display = 'none';
       explanationText.textContent = '';
       nextBtn.disabled = true;
       selected = false;
@@ -252,6 +284,7 @@
         if (i===q.correct) o.classList.add('correct');
         if (i===index && i!==q.correct) o.classList.add('incorrect');
       });
+
       if (index===q.correct) {
         score++;
         feedbackMessage.textContent = "✓ Correct!";
@@ -260,8 +293,13 @@
         feedbackMessage.textContent = "✗ Incorrect!";
         feedbackMessage.className = 'feedback-message feedback-incorrect';
       }
+
       feedbackMessage.style.display = 'block';
+
+      // ✅ Always show explanation
       explanationText.textContent = q.explanation;
+      explanationText.style.display = 'block';
+
       nextBtn.disabled = false;
     }
 
